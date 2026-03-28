@@ -12,6 +12,7 @@ export interface ProductData {
   hide: boolean;
   images: string[]; // Array of Base64 strings (up to 3)
   productId?: string; // Auto-generated
+  totalQuantity: number; // NEW: Inventory management
 }
 
 export const ProductService = {
@@ -122,6 +123,27 @@ export const ProductService = {
     } catch (error: any) {
       console.error("Error deleting product:", error);
       return { success: false, message: error.message || "Failed to delete product" };
+    }
+  },
+
+  /**
+   * Deducts quantity after an order.
+   */
+  async reduceQuantity(productId: string, amount: number) {
+    try {
+      const productRef = doc(db, "products", productId);
+      const productSnap = await getDoc(productRef);
+      
+      if (productSnap.exists()) {
+        const currentQty = productSnap.data().totalQuantity || 0;
+        const newQty = Math.max(0, currentQty - amount);
+        await updateDoc(productRef, { totalQuantity: newQty });
+        return { success: true };
+      }
+      return { success: false, message: "Product not found" };
+    } catch (error: any) {
+      console.error("Error reducing quantity:", error);
+      return { success: false, message: error.message };
     }
   }
 };

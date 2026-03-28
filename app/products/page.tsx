@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { ProductService } from "@/services/product.service";
+import { CategoryService } from "@/services/category.service";
 import Link from "next/link";
 import { EyeOff } from "lucide-react";
 
@@ -20,13 +21,32 @@ function ProductsContent() {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        let data;
-        if (catId) {
-          data = await ProductService.getProductsByCategory(catId);
-        } else {
-          data = await ProductService.getProducts();
-        }
-        setProducts(data);
+        // Fetch products and categories in parallel
+        const [productList, categoryList] = await Promise.all([
+          catId ? ProductService.getProductsByCategory(catId) : ProductService.getProducts(),
+          CategoryService.getCategories()
+        ]);
+
+        // Create a map of category IDs to category data
+        const catMap = (categoryList as any[]).reduce((acc: any, cat: any) => {
+          acc[cat.id] = cat;
+          return acc;
+        }, {});
+
+        // Apply discount logic: category discount (if > 0) overrides product discount
+        const enrichedProducts = (productList as any[]).map((prod: any) => {
+          const category = catMap[prod.categoryId];
+          const effectiveDiscount = (category && category.discount > 0) ? category.discount : prod.discount;
+          const effectiveSellingPrice = Math.round(prod.mrp * (1 - effectiveDiscount / 100));
+          
+          return {
+            ...prod,
+            discount: effectiveDiscount,
+            sellingPrice: effectiveSellingPrice
+          };
+        });
+
+        setProducts(enrichedProducts);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       } finally {

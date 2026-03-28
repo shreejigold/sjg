@@ -16,14 +16,16 @@ import {
   CircleDot,
   Disc,
   Heart,
-  Info
+  Info,
+  ShoppingBag
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { CategoryService } from "@/services/category.service";
+import { CartService } from "@/services/cart.service";
 
 const navLinks = [
-  { name: "All Collection", href: "/collections", icon: LayoutGrid },
+  { name: "All Collections", href: "/collections", icon: LayoutGrid },
   { name: "Necklace", href: "/products?catId=TuBYL1pHFtMO7ADcNh9l&type=Necklace", icon: Sparkles },
   { name: "Ring", href: "/products?catId=8rIGQVVx0iontx0dTtwb&type=Ring", icon: CircleDot },
   { name: "Earrings", href: "/products?catId=2MDq8TDjlRjWwese3nAU&type=Earrings", icon: Disc },
@@ -33,7 +35,7 @@ const navLinks = [
 ];
 
 const actionIcons = [
-  { name: "Diamond", icon: Gem, href: "/products?type=Diamond&catId=3j5DpRKto3RYSmn3uFdG" },
+  // { name: "Diamond", icon: Gem, href: "/products?type=Diamond&catId=3j5DpRKto3RYSmn3uFdG" },
   { name: "Gift", icon: Gift, href: "/products?catId=2nPvppQlM38rwfU04GXW&type=Gifting" },
   { name: "Contact", icon: Phone, href: "/contact" },
 ];
@@ -44,6 +46,17 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      setCartCount(CartService.getCartCount());
+    };
+
+    updateCartCount();
+    window.addEventListener("cart-updated", updateCartCount);
+    return () => window.removeEventListener("cart-updated", updateCartCount);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -166,6 +179,23 @@ export default function Header() {
                 </span>
               </Link>
             ))}
+
+            <Link
+              href="/cart"
+              className="flex flex-col items-center group transition-all gap-1 relative"
+            >
+              <div className="relative">
+                <ShoppingBag size={20} className="text-gold group-hover:text-gold-600 transition-colors stroke-[1.5px]" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden sm:block text-[9px] uppercase tracking-[0.2em] font-bold text-gray-400 group-hover:text-darkbrown transition-colors">
+                Cart
+              </span>
+            </Link>
           </div>
         </div>
       </div>

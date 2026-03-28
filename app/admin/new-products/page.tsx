@@ -28,6 +28,7 @@ export default function NewProductsPage() {
   const [gender, setGender] = useState("Unisex");
   const [hide, setHide] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+  const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   
@@ -65,13 +66,32 @@ export default function NewProductsPage() {
     setIsRefreshing(true);
     setHasSearched(true);
     try {
+      let prods;
       if (filterCategory === "all") {
-        const prods = await NewProductService.getProducts();
-        setProducts(prods);
+        prods = await NewProductService.getProducts();
       } else {
-        const prods = await NewProductService.getProductsByCategory(filterCategory);
-        setProducts(prods);
+        prods = await NewProductService.getProductsByCategory(filterCategory);
       }
+
+      // Enrich products with category discount logic
+      const catMap = categories.reduce((acc: any, cat: any) => {
+        acc[cat.id] = cat;
+        return acc;
+      }, {});
+
+      const enrichedProds = (prods as any[]).map((prod: any) => {
+        const category = catMap[prod.categoryId];
+        const effectiveDiscount = (category && category.discount > 0) ? category.discount : prod.discount;
+        const effectiveSellingPrice = Math.round(prod.mrp * (1 - effectiveDiscount / 100));
+        
+        return {
+          ...prod,
+          discount: effectiveDiscount,
+          sellingPrice: effectiveSellingPrice
+        };
+      });
+
+      setProducts(enrichedProds);
     } catch (err) {
       console.error("Fetch failed:", err);
     } finally {
@@ -119,6 +139,7 @@ export default function NewProductsPage() {
       gender,
       hide,
       images,
+      totalQuantity: Number(totalQuantity),
     };
 
     let result;
@@ -145,6 +166,7 @@ export default function NewProductsPage() {
     setDiscount(0);
     setImages([]);
     setHide(false);
+    setTotalQuantity(0);
     setIsEditing(false);
     setEditId(null);
   };
@@ -165,6 +187,7 @@ export default function NewProductsPage() {
     setHide(prod.hide);
     setGender(prod.gender);
     setSelectedCategory(prod.categoryId);
+    setTotalQuantity(prod.totalQuantity || 0);
     setIsEditing(true);
     setEditId(prod.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -297,6 +320,17 @@ export default function NewProductsPage() {
                       </div>
                    </div>
 
+                  <div className="space-y-3 pt-6">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold ml-2">Available Quantity (In Stock)</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 50" 
+                      value={totalQuantity || ""}
+                      onChange={(e) => setTotalQuantity(Number(e.target.value))}
+                      className="w-full bg-softgray border border-gold/10 rounded-2xl py-5 px-8 outline-none focus:border-gold/50 transition-all font-bold text-xl"
+                    />
+                  </div>
+
                    <div className="flex items-center gap-6 pt-6 text-darkbrown">
                       <button 
                         type="button" 
@@ -383,6 +417,13 @@ export default function NewProductsPage() {
                                 {prod.discount}% SAVINGS
                              </div>
                            )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-2 px-2">
+                           <span>Balance Quantity</span>
+                           <span className={`text-sm font-bold ${prod.totalQuantity <= 5 ? 'text-red-500 animate-pulse' : 'text-gold'}`}>
+                              {prod.totalQuantity || 0} Units
+                           </span>
                         </div>
                      </div>
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { 
   Plus, Image as ImageIcon, Tag, EyeOff, Eye, 
   Loader2, Trash2, CheckCircle2, User, 
-  DollarSign, Percent, Briefcase, Users, X, Hash, Search, RefreshCw, LayoutGrid
+  DollarSign, Percent, Briefcase, Users, X, Hash, Search, RefreshCw, LayoutGrid, Pencil
 } from "lucide-react";
 import { ImageUtils } from "@/utils/image";
 import { ProductService, ProductData } from "@/services/product.service";
@@ -27,6 +27,7 @@ export default function ProductsPage() {
   const [gender, setGender] = useState("Unisex");
   const [hide, setHide] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+  const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   
@@ -64,13 +65,32 @@ export default function ProductsPage() {
     setIsRefreshing(true);
     setHasSearched(true);
     try {
+      let prods;
       if (filterCategory === "all") {
-        const prods = await ProductService.getProducts();
-        setProducts(prods);
+        prods = await ProductService.getProducts();
       } else {
-        const prods = await ProductService.getProductsByCategory(filterCategory);
-        setProducts(prods);
+        prods = await ProductService.getProductsByCategory(filterCategory);
       }
+
+      // Enrich products with category discount logic
+      const catMap = categories.reduce((acc: any, cat: any) => {
+        acc[cat.id] = cat;
+        return acc;
+      }, {});
+
+      const enrichedProds = (prods as any[]).map((prod: any) => {
+        const category = catMap[prod.categoryId];
+        const effectiveDiscount = (category && category.discount > 0) ? category.discount : prod.discount;
+        const effectiveSellingPrice = Math.round(prod.mrp * (1 - effectiveDiscount / 100));
+        
+        return {
+          ...prod,
+          discount: effectiveDiscount,
+          sellingPrice: effectiveSellingPrice
+        };
+      });
+
+      setProducts(enrichedProds);
     } catch (err) {
       console.error("Fetch failed:", err);
     } finally {
@@ -118,6 +138,7 @@ export default function ProductsPage() {
       gender,
       hide,
       images,
+      totalQuantity: Number(totalQuantity),
     };
 
     let result;
@@ -144,6 +165,7 @@ export default function ProductsPage() {
     setDiscount(0);
     setImages([]);
     setHide(false);
+    setTotalQuantity(0);
     setIsEditing(false);
     setEditId(null);
   };
@@ -164,6 +186,7 @@ export default function ProductsPage() {
     setHide(prod.hide);
     setGender(prod.gender);
     setSelectedCategory(prod.categoryId);
+    setTotalQuantity(prod.totalQuantity || 0);
     setIsEditing(true);
     setEditId(prod.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -294,9 +317,20 @@ export default function ProductsPage() {
                            </button>
                          )}
                       </div>
-                   </div>
+                    </div>
 
-                   <div className="flex items-center gap-6 pt-6">
+                  <div className="space-y-3 pt-6">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold ml-2">Available Quantity (In Stock)</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 50" 
+                      value={totalQuantity || ""}
+                      onChange={(e) => setTotalQuantity(Number(e.target.value))}
+                      className="w-full bg-softgray border border-gold/10 rounded-2xl py-5 px-8 outline-none focus:border-gold/50 transition-all font-bold text-xl"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-6 pt-6">
                       <button 
                         type="button" 
                         onClick={() => setHide(!hide)} 
@@ -383,6 +417,13 @@ export default function ProductsPage() {
                              </div>
                            )}
                         </div>
+                        
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-2 px-2">
+                           <span>Balance Quantity</span>
+                           <span className={`text-xs font-bold ${prod.totalQuantity <= 5 ? 'text-red-500 animate-pulse' : 'text-gold'}`}>
+                              {prod.totalQuantity || 0} Units
+                           </span>
+                        </div>
                      </div>
 
                      <div className="flex items-center gap-3 pt-4 border-t border-gold/5">
@@ -390,7 +431,7 @@ export default function ProductsPage() {
                           onClick={() => startEdit(prod)}
                           className="flex-1 bg-softgray hover:bg-gold hover:text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-500 flex items-center justify-center gap-2"
                         >
-                           <RefreshCw size={14} /> Refine Asset
+                           <Pencil size={14} /> Refine Asset
                         </button>
                         <button 
                           onClick={() => handleDelete(prod.id)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Instagram, Facebook, Twitter, Mail, MapPin } from "lucide-react";
+import { Instagram, Facebook, Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -12,17 +12,22 @@ export default function Footer() {
                 Exquisite craftsmanship from the heart of India. Dedicated to delivering purity and timeless elegance since decades.
              </p>
              <div className="flex gap-6">
-                {[Instagram, Facebook, Twitter, Mail].map((Icon, idx) => (
-                  <a key={idx} href="#" className="text-zinc-500 hover:text-gold transition-colors">
-                     <Icon size={20} />
-                  </a>
-                ))}
+                <a href="https://www.instagram.com/shrijigold_02" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-[#5B3E29] transition-colors" aria-label="Instagram">
+                   <Instagram size={20} />
+                </a>
+                <a href="https://www.facebook.com/people/Shri-Ji-Gold/" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-[#5B3E29] transition-colors" aria-label="Facebook">
+                   <Facebook size={20} />
+                </a>
+                <a href="mailto:contact@shrijigold.com" className="text-zinc-500 hover:text-[#5B3E29] transition-colors" aria-label="Email">
+                   <Mail size={20} />
+                </a>
              </div>
           </div>
 
           <div>
              <h4 className="text-[10px] uppercase tracking-widest font-bold text-gold mb-8">Information</h4>
              <ul className="space-y-4 text-xs text-zinc-400">
+                <li><a href="/collections" className="hover:text-white transition-colors">Our Collections</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>

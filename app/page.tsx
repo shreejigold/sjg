@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import TrendingCategories from "@/components/home/TrendingCategories"; // ADDED
+import BudgetCollections from "@/components/home/BudgetCollections";
 import Categories from "@/components/home/Categories";
 import NewArrivals from "@/components/home/NewArrivals";
 import FeaturedQuote from "@/components/home/FeaturedQuote";
@@ -38,6 +39,7 @@ export default function Home() {
       <main>
         <Hero />
         <TrendingCategories categories={trendingCategories} />
+        <BudgetCollections />
         <Categories categories={normalCategories} />
         <NewArrivals />
         <InstagramReels />

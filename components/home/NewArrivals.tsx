@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight, Sparkles, ArrowRight, Heart, ShoppingBag } from "lucide-react";
 import { NewProductService } from "@/services/newProduct.service";
+import { CategoryService } from "@/services/category.service";
+import { CartService } from "@/services/cart.service";
 
 export default function NewArrivals() {
   const [products, setProducts] = useState<any[]>([]);
@@ -12,118 +14,145 @@ export default function NewArrivals() {
 
   useEffect(() => {
     const fetchNewArrivals = async () => {
-      const data = await NewProductService.getProducts();
-      setProducts(data);
-      setIsLoading(false);
+      try {
+        const [productList, categoryList] = await Promise.all([
+          NewProductService.getProducts(),
+          CategoryService.getCategories()
+        ]);
+
+        const catMap = (categoryList as any[]).reduce((acc: any, cat: any) => {
+          acc[cat.id] = cat;
+          return acc;
+        }, {});
+
+        const enrichedProducts = (productList as any[]).map((prod: any) => {
+          const category = catMap[prod.categoryId];
+          const effectiveDiscount = (category && category.discount > 0) ? category.discount : prod.discount;
+          const effectiveSellingPrice = Math.round(prod.mrp * (1 - effectiveDiscount / 100));
+          
+          return {
+            ...prod,
+            discount: effectiveDiscount,
+            sellingPrice: effectiveSellingPrice
+          };
+        });
+
+        setProducts(enrichedProducts);
+      } catch (error) {
+        console.error("Failed to fetch new arrivals:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchNewArrivals();
   }, []);
+
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    CartService.addToCart({
+      id: product.id,
+      productId: product.productId,
+      title: product.title,
+      price: product.sellingPrice,
+      image: product.images[0],
+      quantity: 1,
+      stock: product.totalQuantity,
+      collection: 'newProducts'
+    });
+  };
 
   if (isLoading) return null;
   if (products.length === 0) return null;
 
   return (
     <section className="py-24 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 text-gold font-bold tracking-[0.3em] uppercase text-[10px]">
-            <Sparkles size={16} /> Seasonal Highlights
-          </div>
-          <h2 className="text-4xl md:text-6xl font-playfair font-black text-darkbrown leading-tight">
-            New Arrivals
-          </h2>
-          <div className="h-1.5 w-24 bg-gold/30 rounded-full" />
+      <div className="max-w-7xl mx-auto px-6 mb-10 md:mb-12 flex items-center justify-between">
+        <div>
+           <h2 className="text-4xl md:text-[2.75rem] font-playfair font-black text-[#3D2B1F] leading-tight tracking-tighter uppercase mb-3">
+             NEW ARRIVALS
+           </h2>
+           <div className="h-1 w-20 md:w-28 bg-[#E8D4A2] rounded-full" />
         </div>
         
         {products.length > 5 && (
           <Link 
             href="/new-arrivals" 
-            className="flex items-center gap-3 group text-darkbrown/60 hover:text-gold transition-all"
+            className="hidden md:flex items-center gap-2 group text-darkbrown/60 hover:text-[#3D2B1F] transition-all"
           >
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">View All Collection</span>
-            <div className="w-10 h-10 rounded-full border border-gold/20 flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">
-               <ArrowRight size={18} />
-            </div>
+            <span className="text-[9px] font-black uppercase tracking-[0.2em]">View All</span>
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         )}
       </div>
 
-      {/* Product Slider / Scrolling Area */}
-      <div className="relative">
-        <div className="flex overflow-x-auto gap-8 px-6 pb-12 custom-scrollbar snap-x snap-mandatory lg:px-[calc((100vw-1280px)/2)] scroll-smooth">
-          {products.slice(0, 10).map((prod, idx) => (
+      {/* Product Grid Layout */}
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          {products.slice(0, 5).map((prod, idx) => (
             <motion.div
               key={prod.id}
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="min-w-[280px] md:min-w-[340px] snap-start"
+              className="flex flex-col group"
             >
-              <Link href={`/products/${prod.id}`} className="block group">
-                <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-gold/10 bg-softgray/30 mb-6 group-hover:border-gold/30 transition-all duration-700 shadow-xl shadow-pink/5">
+              <Link href={`/products/${prod.id}`} className="block flex-1 flex flex-col">
+                <div className="relative aspect-[4/5] md:aspect-square rounded-2xl overflow-hidden shadow-sm border border-gold/10 bg-softgray/10 mb-4 transition-all duration-300">
                   <img 
                     src={prod.images[0]} 
                     alt={prod.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   
-                  {/* Quick Action Overlay */}
-                  <div className="absolute top-6 right-6 flex flex-col gap-3 translate-x-12 group-hover:translate-x-0 transition-transform duration-500">
-                    <button className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-darkbrown/40 hover:text-red-500 shadow-lg shadow-black/5">
-                      <Heart size={18} />
-                    </button>
-                    <button className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-darkbrown/40 hover:text-gold shadow-lg shadow-black/5">
-                      <ShoppingBag size={18} />
-                    </button>
-                  </div>
-
-                  {/* Badges */}
-                  <div className="absolute bottom-6 left-6">
-                     <span className="bg-white/80 backdrop-blur-md text-[8px] font-bold text-darkbrown px-3 py-1.5 rounded-full border border-gold/10 uppercase tracking-widest shadow-lg">
-                        {prod.categoryTitle}
+                  {/* Category Pill */}
+                  <div className="absolute bottom-3 left-3">
+                     <span className="bg-[#EAE1D0]/95 backdrop-blur-md text-[#3D2B1F] font-bold text-[8px] uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                        {prod.categoryTitle || 'Exclusive'}
                      </span>
                   </div>
                 </div>
 
-                <div className="px-4">
-                  <h3 className="text-darkbrown group-hover:text-gold transition-colors font-bold text-lg leading-snug line-clamp-1 mb-2">
+                <div className="px-1 flex flex-col flex-1 pb-2">
+                  <h3 className="text-[#3D2B1F] uppercase tracking-[0.1em] font-bold text-[10px] md:text-sx line-clamp-1 mb-1.5 transition-colors group-hover:text-gold">
                     {prod.title}
                   </h3>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl font-bold text-darkbrown">₹{prod.sellingPrice.toLocaleString()}</span>
+                  
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xs md:text-sm font-black text-[#4A3320] tracking-wider">RS. {prod.sellingPrice.toLocaleString()}.00</span>
                     {prod.mrp > prod.sellingPrice && (
-                      <span className="text-xs text-darkbrown/30 line-through italic">₹{prod.mrp.toLocaleString()}</span>
+                       <>
+                         <span className="text-[#4A3320]/30">|</span>
+                         <span className="text-[10px] text-[#4A3320]/50 line-through">RS. {prod.mrp.toLocaleString()}.00</span>
+                       </>
                     )}
                   </div>
                   
-                  {/* New Arrival Indicator */}
-                  <div className="flex items-center gap-2 mt-4 text-[9px] font-black uppercase tracking-[0.2em] text-gold animate-pulse">
-                     <div className="w-1 h-1 rounded-full bg-gold" /> Just Launched
+                  {/* Explicit Action Button */}
+                  <div className="mt-auto">
+                     <button className="w-full bg-[#4A3320] text-white py-3 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-[#3D2B1F] shadow-sm">
+                       Check Details
+                     </button>
                   </div>
                 </div>
               </Link>
             </motion.div>
           ))}
-
-          {/* End Card - View More Link */}
-          {products.length > 10 && (
-             <motion.div
-               initial={{ opacity: 0, scale: 0.9 }}
-               whileInView={{ opacity: 1, scale: 1 }}
-               className="min-w-[280px] md:min-w-[340px] flex items-center justify-center snap-start"
-             >
-                <Link href="/new-arrivals" className="group text-center">
-                   <div className="w-24 h-24 rounded-full border-2 border-dashed border-gold/20 flex items-center justify-center mx-auto mb-6 group-hover:border-gold group-hover:bg-gold/5 transition-all">
-                      <ChevronRight size={32} className="text-gold group-hover:translate-x-1 transition-transform" />
-                   </div>
-                   <span className="text-[10px] font-black uppercase tracking-[0.3em] text-darkbrown/40 group-hover:text-gold transition-colors">
-                      Discover More
-                   </span>
-                </Link>
-             </motion.div>
-          )}
         </div>
+        
+        {/* Mobile View All */}
+        {products.length > 5 && (
+           <div className="mt-10 flex justify-center md:hidden">
+              <Link 
+                href="/new-arrivals" 
+                className="bg-transparent border border-[#3D2B1F]/20 text-[#3D2B1F] hover:bg-[#3D2B1F] hover:text-white px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+              >
+                View All New Arrivals
+              </Link>
+           </div>
+        )}
       </div>
     </section>
   );

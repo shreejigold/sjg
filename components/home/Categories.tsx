@@ -10,12 +10,12 @@ interface CategoriesProps {
 export default function Categories({ categories }: CategoriesProps) {
   return (
     <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-       <div className="flex flex-col items-center mb-16">
-          <h3 className="font-playfair text-3xl md:text-5xl font-bold text-darkbrown mb-4">Our Categories</h3>
-          <div className="w-24 h-[1px] bg-gold/50" />
+       <div className="flex flex-col items-center mb-12">
+          <h3 className="font-playfair text-2xl md:text-4xl font-black text-darkbrown mb-4 uppercase tracking-tighter">Our Categories</h3>
+          <div className="w-16 h-[1px] bg-gold/50" />
        </div>
 
-       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
           {categories.map((cat, idx) => (
              <Link key={cat.id} href={`/collections/${cat.id}`}>
                <motion.div
@@ -25,7 +25,7 @@ export default function Categories({ categories }: CategoriesProps) {
                  viewport={{ once: true }}
                  className="flex flex-col items-center group cursor-pointer"
                >
-                  <div className="relative w-32 h-32 md:w-48 md:h-48 mb-6">
+                  <div className="relative w-24 h-24 md:w-36 md:h-36 mb-6">
                      {/* Circular Frame Decor */}
                      <div className="absolute inset-0 border border-gold/20 rounded-full scale-110 group-hover:scale-125 group-hover:border-gold/50 transition-all duration-700" />
                      <div className="absolute inset-0 border border-gold/10 rounded-full scale-105 group-hover:rotate-45 transition-all duration-1000" />
@@ -44,11 +44,7 @@ export default function Categories({ categories }: CategoriesProps) {
                   <h4 className="text-darkbrown/70 group-hover:text-gold transition-colors font-bold uppercase tracking-[0.2em] text-xs md:text-sm text-center">
                      {cat.title}
                   </h4>
-                  {cat.discount > 0 && (
-                    <span className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-widest">
-                       Up to {cat.discount}% Off
-                    </span>
-                  )}
+                   {/* Discount removed as requested */}
                </motion.div>
              </Link>
           ))}

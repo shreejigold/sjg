@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Home, LayoutDashboard, Settings, User, Layers, Tag, Sparkles } from "lucide-react";
+import { LogOut, Home, LayoutDashboard, Settings, User, Layers, Tag, Sparkles, ShoppingBag, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
@@ -16,6 +16,8 @@ export default function Sidebar() {
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
+    { icon: ShoppingBag, label: "Orders", href: "/admin/dashboard?tab=orders" },
+    { icon: Users, label: "Customers", href: "/admin/dashboard?tab=customers" },
     { icon: Layers, label: "Categories", href: "/admin/categories" },
     { icon: Tag, label: "Products", href: "/admin/products" },
     { icon: Sparkles, label: "New Arrivals", href: "/admin/new-products" },

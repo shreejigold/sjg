@@ -41,7 +41,7 @@ export default function NewArrivalsFullPage() {
       
       <main className="flex-1 w-full pt-32 pb-24">
         {/* New Arrivals Hero Section */}
-        <section className="px-6 md:px-12 max-w-7xl mx-auto mb-16 relative overflow-hidden bg-pink/20 rounded-[3rem] p-12 md:p-20 border border-gold/10">
+        <section className="px-6 md:px-12 max-w-7xl mx-auto mb-16 relative overflow-hidden bg-pink/20 rounded-3xl p-12 md:p-20 border border-gold/10">
           <div className="absolute -top-20 -right-20 opacity-[0.05] rotate-12">
              <Sparkles size={400} className="text-gold" />
           </div>
@@ -55,7 +55,7 @@ export default function NewArrivalsFullPage() {
                 <ChevronRight size={10} />
                 <span>New Arrivals</span>
               </div>
-              <h1 className="text-5xl md:text-7xl font-playfair font-black text-darkbrown leading-tight mb-8">
+              <h1 className="text-4xl md:text-6xl font-playfair font-black text-darkbrown leading-tight mb-6">
                 The Heritage <br /> Seasonal
               </h1>
               <p className="text-sm md:text-base text-darkbrown/60 leading-relaxed max-w-xl">
@@ -78,7 +78,7 @@ export default function NewArrivalsFullPage() {
              <p className="text-[10px] font-black uppercase tracking-widest">{products.length} Masterpieces Found</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
             {products.map((product, idx) => (
               <motion.div
                 key={product.id}
@@ -88,12 +88,12 @@ export default function NewArrivalsFullPage() {
                 transition={{ delay: idx * 0.05 }}
                 className="group flex flex-col"
               >
-                <Link href={`/products/${product.id}`} className="flex flex-col h-full">
-                  <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden border border-gold/10 bg-softgray/30 mb-6 group-hover:border-gold/30 transition-all duration-700 shadow-xl shadow-pink/5">
+                <Link href={`/products/${product.id}`} className="flex flex-col h-full group">
+                  <div className="relative aspect-square rounded-2xl overflow-hidden shadow-md shadow-black/10 bg-softgray/10 mb-5 group-hover:shadow-xl transition-all duration-500">
                     <img 
                       src={product.images[0]} 
                       alt={product.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     
                     {/* Badge */}
@@ -111,20 +111,20 @@ export default function NewArrivalsFullPage() {
                     </div>
                   </div>
 
-                  <div className="px-2 flex-1 flex flex-col">
-                    <h3 className="text-darkbrown group-hover:text-gold transition-colors font-bold text-lg leading-snug line-clamp-1 mb-2">
-                      {product.title}
-                    </h3>
-                    <div className="flex items-center gap-3 mb-8">
-                      <span className="text-xl font-bold text-darkbrown">₹{product.sellingPrice.toLocaleString()}</span>
+                  <div className="px-1 flex-1 flex flex-col items-center text-center mt-2">
+                    <div className="flex items-center justify-center gap-2 mb-1.5">
+                      <span className="text-xs font-bold text-darkbrown tracking-wider">RS. {product.sellingPrice.toLocaleString()}.00</span>
                       {product.mrp > product.sellingPrice && (
-                        <span className="text-xs text-darkbrown/40 line-through italic">₹{product.mrp.toLocaleString()}</span>
+                        <>
+                          <span className="text-darkbrown/30 font-light">|</span>
+                          <span className="text-[10px] text-darkbrown/50 line-through tracking-wider">RS. {product.mrp.toLocaleString()}.00</span>
+                        </>
                       )}
                     </div>
                     
-                    <button className="w-full border border-gold/30 hover:bg-gold hover:text-white py-3.5 rounded-2xl font-bold uppercase tracking-[0.2em] text-[9px] transition-all duration-500 flex items-center justify-center gap-3 group-hover:shadow-lg group-hover:shadow-gold/10">
-                       Examine Details <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    <h3 className="text-darkbrown/60 uppercase tracking-widest font-medium text-[9px] line-clamp-1">
+                      {product.title}
+                    </h3>
                   </div>
                 </Link>
               </motion.div>
