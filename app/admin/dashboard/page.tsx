@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   LayoutDashboard, User, ArrowUpRight, 
@@ -16,7 +16,7 @@ import { OrderService } from "@/services/order.service";
 
 type DashboardTab = 'overview' | 'orders' | 'customers';
 
-export default function AdminDashboard() {
+function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -346,5 +346,13 @@ export default function AdminDashboard() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-playfair text-gold text-xl tracking-widest uppercase">Loading Legacy Vault...</div>}>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
