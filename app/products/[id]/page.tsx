@@ -215,6 +215,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <span className="bg-pink text-gold px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase border border-gold/10">
                    {product.categoryTitle || "Exquisite Selection"}
                 </span>
+                <span className="border border-gold/20 text-gold px-4 py-1.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase">
+                   Wearable: {product.gender}
+                </span>
                 <span className="text-darkbrown/40 text-[10px] tracking-widest uppercase font-bold ml-2">
                    ID: {product.productId}
                 </span>

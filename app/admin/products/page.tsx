@@ -27,7 +27,7 @@ export default function ProductsPage() {
   const [gender, setGender] = useState("Unisex");
   const [hide, setHide] = useState(false);
   const [images, setImages] = useState<string[]>([]);
-  const [totalQuantity, setTotalQuantity] = useState<number>(0);
+  const [totalQuantity, setTotalQuantity] = useState<number>(1);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   
@@ -165,7 +165,7 @@ export default function ProductsPage() {
     setDiscount(0);
     setImages([]);
     setHide(false);
-    setTotalQuantity(0);
+    setTotalQuantity(1);
     setIsEditing(false);
     setEditId(null);
   };
@@ -403,7 +403,6 @@ export default function ProductsPage() {
                      <div className="space-y-4 px-2">
                         <div className="flex justify-between items-start gap-4">
                            <h3 className="text-xl font-bold text-darkbrown group-hover:text-gold transition-colors leading-tight">{prod.title}</h3>
-                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300 italic">{prod.gender}</span>
                         </div>
                         
                         <div className="flex items-end justify-between">

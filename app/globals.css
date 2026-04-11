@@ -26,6 +26,7 @@
   --color-gold-600: #9A7D0A;
   --font-playfair: var(--font-playfair);
   --font-montserrat: var(--font-montserrat);
+  --font-cursive: var(--font-cursive);
 }
 
 body {
@@ -38,7 +39,7 @@ body {
 }
 
 .font-cursive {
-  font-family: 'Great Vibes', cursive;
+  font-family: var(--font-cursive), cursive;
 }
 
 .text-gold-gradient {

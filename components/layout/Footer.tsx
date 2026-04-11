@@ -29,9 +29,10 @@ export default function Footer() {
              <ul className="space-y-4 text-xs text-zinc-400">
                 <li><a href="/collections" className="hover:text-white transition-colors">Our Collections</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Returns & Exchanges</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/returns" className="hover:text-white transition-colors">Returns & Exchanges</a></li>
              </ul>
           </div>
 

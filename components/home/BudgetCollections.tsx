@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ProductService } from "@/services/product.service";
 import { CategoryService } from "@/services/category.service";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const BUDGETS = [1999, 2999, 3999, 4999, 5999, 9999];
 
@@ -12,15 +13,36 @@ export default function BudgetCollections() {
   const [activeBudget, setActiveBudget] = useState<number | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(8);
+
+  // Update display limit based on screen size (2 rows)
+  useEffect(() => {
+    const updateLimit = () => {
+      if (window.innerWidth < 768) {
+        setDisplayLimit(4); // 2 columns * 2 rows
+      } else if (window.innerWidth < 1024) {
+        setDisplayLimit(8); // 4 columns * 2 rows
+      } else {
+        setDisplayLimit(10); // 5 columns * 2 rows
+      }
+    };
+    
+    updateLimit();
+    window.addEventListener("resize", updateLimit);
+    return () => window.removeEventListener("resize", updateLimit);
+  }, []);
 
   useEffect(() => {
     if (activeBudget === null) {
       setProducts([]);
+      setIsExpanded(false);
       return;
     }
 
     const fetchBudgetProducts = async () => {
       setLoading(true);
+      setIsExpanded(false);
       try {
         const [productList, categoryList] = await Promise.all([
           ProductService.getProducts(),
@@ -47,8 +69,8 @@ export default function BudgetCollections() {
         // Filter products under budget
         const filtered = enrichedProducts.filter(p => p.sellingPrice <= activeBudget);
         
-        // Return max 10 products as requested
-        setProducts(filtered.slice(0, 10));
+        // Fetch all matching products up to 40 for the grid
+        setProducts(filtered.slice(0, 40));
       } catch (error) {
         console.error("Failed to fetch budget products:", error);
       } finally {
@@ -58,6 +80,8 @@ export default function BudgetCollections() {
 
     fetchBudgetProducts();
   }, [activeBudget]);
+
+  const visibleProducts = isExpanded ? products : products.slice(0, displayLimit);
 
   return (
     <section className="bg-white py-12">
@@ -69,21 +93,20 @@ export default function BudgetCollections() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 overflow-hidden">
-        {/* Horizontal scroll of budget tiles */}
-        <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-8 snap-x scroll-smooth">
+        {/* Grid layout of budget tiles instead of horizontal scroll */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-8 mb-8">
            {BUDGETS.map((budget) => (
              <button
                key={budget}
                onClick={() => setActiveBudget(activeBudget === budget ? null : budget)}
-               className={`shrink-0 w-28 h-28 md:w-36 md:h-36 rounded-[2rem] bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] flex items-center justify-center snap-center transition-all duration-300 ${activeBudget === budget ? 'ring-2 ring-[#c0997c] scale-105 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] bg-orange-50/30' : 'hover:scale-105 hover:bg-orange-50/10'}`}
+               className={`w-full aspect-square rounded-[1.5rem] md:rounded-[2rem] bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all duration-300 ${activeBudget === budget ? 'ring-2 ring-[#c0997c] scale-105 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] bg-orange-50/30' : 'hover:scale-105 hover:bg-orange-50/10'}`}
              >
                 <div className="w-[85%] h-[85%] rounded-full border-[1.5px] border-[#c0997c]/80 flex flex-col items-center justify-center relative">
-                   {/* Emulate mandala/decorative concentric borders */}
-                   <div className="absolute inset-1.5 rounded-full border-[2px] border-dotted border-[#c0997c]/60" />
-                   <div className="absolute inset-3 rounded-full border border-dashed border-[#c0997c]/30" />
+                   <div className="absolute inset-1 rounded-full border-[2px] border-dotted border-[#c0997c]/60" />
+                   <div className="absolute inset-2.5 rounded-full border border-dashed border-[#c0997c]/30" />
                    
-                   <span className="text-[10px] md:text-xs text-[#5B3E29] font-playfair tracking-widest leading-none mb-1 z-10 pt-2">UNDER</span>
-                   <span className="text-lg md:text-[22px] font-black text-[#5B3E29] tracking-tight z-10">{budget}</span>
+                   <span className="text-[8px] md:text-[10px] text-[#5B3E29] font-playfair tracking-widest leading-none mb-1 z-10 pt-1">UNDER</span>
+                   <span className="text-base md:text-[22px] font-black text-[#5B3E29] tracking-tight z-10">{budget}</span>
                 </div>
              </button>
            ))}
@@ -112,12 +135,12 @@ export default function BudgetCollections() {
                           Curated Under {activeBudget}
                        </h3>
                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                           {products.map((prod, idx) => (
+                           {visibleProducts.map((prod, idx) => (
                               <motion.div
-                                key={prod.id}
+                                key={`${prod.id}-${idx}`}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
+                                transition={{ delay: idx % displayLimit * 0.05 }}
                               >
                                 <Link href={`/products/${prod.id}`} className="block flex-1 flex flex-col group h-full">
                                   <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm border border-gold/10 bg-softgray/10 mb-3 transition-all duration-300">
@@ -152,6 +175,21 @@ export default function BudgetCollections() {
                               </motion.div>
                            ))}
                        </div>
+
+                       {products.length > displayLimit && (
+                         <div className="flex justify-center mt-12">
+                            <button
+                              onClick={() => setIsExpanded(!isExpanded)}
+                              className="group flex items-center gap-3 px-8 py-3 bg-[#3D2B1F] text-white rounded-full text-xs font-bold uppercase tracking-[0.2em] shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                            >
+                               {isExpanded ? (
+                                 <>Show Less <ChevronUp size={16} /></>
+                               ) : (
+                                 <>See All Collection <ChevronDown size={16} /></>
+                               )}
+                            </button>
+                         </div>
+                       )}
                     </div>
                   )}
               </motion.div>
