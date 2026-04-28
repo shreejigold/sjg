@@ -273,6 +273,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                        {product.totalQuantity <= 0 ? "Out of Stock" : isAdded ? "Added to Cart" : "Add to Cart"}
                     </button>
                 </div>
+                <div className="text-center mt-4">
+                  <p className="text-[10px] text-darkbrown/60 font-semibold uppercase tracking-wider">
+                    <span className="text-red-500 font-bold">No Refund</span> • Exchange within 7 days for defective/wrong items. 
+                    <Link href="/returns" className="text-gold hover:underline ml-1 font-bold">
+                      View Policy
+                    </Link>
+                  </p>
+                </div>
              </div>
 
              {/* Features / Badges */}

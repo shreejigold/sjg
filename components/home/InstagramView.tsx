@@ -17,7 +17,7 @@ export default function InstagramView() {
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink/30 rounded-full blur-3xl -ml-48 -mb-48 opacity-50" />
-      
+
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
           <div className="max-w-xl text-left">
@@ -35,9 +35,9 @@ export default function InstagramView() {
               </p>
             </motion.div>
           </div>
-          
+
           <motion.a
-            href="https://instagram.com" 
+            href="https://www.instagram.com/shrijigold_02"
             target="_blank"
             rel="noopener noreferrer"
             initial={{ opacity: 0, y: 10 }}
@@ -68,13 +68,13 @@ export default function InstagramView() {
                 fill
                 className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
               />
-              
+
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-darkbrown/90 via-darkbrown/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                <motion.div 
-                   initial={{ opacity: 0, y: 20 }}
-                   whileHover={{ opacity: 1, y: 0 }}
-                   className="flex items-center gap-2 text-white/90"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileHover={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-white/90"
                 >
                   <div className="w-8 h-8 rounded-full bg-gold/20 backdrop-blur-md flex items-center justify-center border border-gold/30">
                     <Play className="w-3 h-3 fill-gold text-gold" />
@@ -85,18 +85,18 @@ export default function InstagramView() {
                   {reel.likes} people loved this
                 </div>
               </div>
-              
+
               {/* Decorative inner frame */}
               <div className="absolute inset-4 border border-white/0 group-hover:border-white/20 rounded-xl transition-all duration-700 pointer-events-none" />
             </motion.div>
           ))}
         </div>
-        
+
         {/* Mobile View All */}
         <div className="mt-12 text-center lg:hidden">
-            <button className="gold-button w-full py-4 rounded-xl font-bold uppercase tracking-widest text-[10px]">
-                Explore Gallery
-            </button>
+          <button className="gold-button w-full py-4 rounded-xl font-bold uppercase tracking-widest text-[10px]">
+            Explore Gallery
+          </button>
         </div>
       </div>
 

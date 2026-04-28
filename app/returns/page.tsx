@@ -8,24 +8,12 @@ import { RefreshCcw, Sparkles } from "lucide-react";
 export default function ReturnsPage() {
   const points = [
     {
-      title: "Return Eligibility",
-      content: "Items can be returned within 7 days of delivery if they remain in their original, unworn condition with all security tags and packaging intact."
-    },
-    {
-      title: "Exchange Process",
-      content: "We offer seamless exchanges for different sizes or designs. Simply reach out to our concierge team to initiate a replacement request."
-    },
-    {
-      title: "Custom Orders",
-      content: "Please note that bespoke or customized jewelry items are specifically made for you and are not eligible for returns unless there is a manufacturing defect."
-    },
-    {
       title: "Refunds",
-      content: "Once the item is inspected and approved, the refund will be processed to your original payment method within 10-14 working days."
+      content: "We have a strict no refund policy. We do not offer refunds on any purchases."
     },
     {
-      title: "Return Logistics",
-      content: "Shri Ji Gold provides a secure pickup service for returns. Please ensure you receive a receipt from the courier at the time of collection."
+      title: "Exchanges",
+      content: "Exchanges are only allowed within 7 days of delivery, and strictly in the case of a defected product or wrong product delivery. Valid proof of the defect or incorrect item is required."
     }
   ];
 

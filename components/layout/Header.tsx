@@ -30,7 +30,7 @@ const navLinks = [
   { name: "Ring", href: "/products?catId=8rIGQVVx0iontx0dTtwb&type=Ring", icon: CircleDot },
   { name: "Earrings", href: "/products?catId=2MDq8TDjlRjWwese3nAU&type=Earrings", icon: Disc },
   { name: "Bridal Special", href: "/products?catId=JR73gePCr49jMfh9FI1i&type=Bridal+Jewellery", icon: Heart },
-  { name: "About us", href: "/about", icon: Info },
+  // { name: "About us", href: "/about", icon: Info },
   { name: "Contact us", href: "/contact", icon: Phone },
 ];
 

@@ -18,6 +18,8 @@ export interface OrderData {
   paymentMethod: string;
   items: CartItem[];
   subtotal: number;
+  deliveryCharge?: number;
+  total?: number;
   status: 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Cancelled';
 }
 
@@ -40,6 +42,8 @@ export const OrderService = {
         paymentMethod: data.paymentMethod,
         items: data.items,
         subtotal: data.subtotal,
+        deliveryCharge: data.deliveryCharge || 0,
+        total: data.total || data.subtotal,
         status: 'Pending',
         createdAt: Timestamp.now(),
       });
