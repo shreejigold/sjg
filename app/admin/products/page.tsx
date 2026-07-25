@@ -99,18 +99,25 @@ export default function ProductsPage() {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      if (images.length >= 3) {
-        alert("Maximum of 3 images allowed.");
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      const availableSlots = 3 - images.length;
+      
+      if (files.length > availableSlots) {
+        alert(`You can only select up to ${availableSlots} more image(s). Maximum of 3 images allowed in total.`);
+        e.target.value = '';
         return;
       }
+      
       try {
-        const base64 = await ImageUtils.compressAndConvertToBase64(e.target.files[0], 120);
-        setImages((prev) => [...prev, base64]);
+        const base64Promises = files.map(file => ImageUtils.compressAndConvertToBase64(file, 120));
+        const base64Results = await Promise.all(base64Promises);
+        setImages((prev) => [...prev, ...base64Results]);
       } catch (err) {
         console.error("Image processing failed", err);
       }
     }
+    if (e.target) e.target.value = '';
   };
 
   const removeImage = (index: number) => {
@@ -313,7 +320,7 @@ export default function ProductsPage() {
                            >
                               <ImageIcon className="text-gold" size={24} />
                               <span className="text-[8px] font-black uppercase tracking-widest text-zinc-400">Add Image</span>
-                              <input id="prodInp" type="file" className="hidden" onChange={handleImageUpload} />
+                              <input id="prodInp" type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                            </button>
                          )}
                       </div>
